@@ -2,6 +2,7 @@ import pyedflib
 import numpy as np 
 import pandas as pd 
 
+
 def read_bdf(file_path): 
     #open BDF file 
     f = pyedflib.EdfReader(file_path)
@@ -15,22 +16,6 @@ def read_bdf(file_path):
     annotations = f.readAnnotations()
     f.close() 
     return signal_labels, signal_data, annotations
-
-
-def get_annotations(file_path):
-    #open BDF file 
-    f = pyedflib.EdfReader(file_path)
-
-    # extract annotations
-    annotations = f.readAnnotations()
-    #close the file 
-    f.close() 
-    return annotations
-
-file_path = 'Matlab_scripts/444931.bdf'
-annotations = get_annotations(file_path)
-print(annotations)
-
 
 def save_samples(signal_data, signal_labels, annotations, sample_duration=10, step_size=5, file_prefix='sample'):
     data_array = np.array(signal_data).T
@@ -56,8 +41,6 @@ def save_samples(signal_data, signal_labels, annotations, sample_duration=10, st
 
     print("Annotations:")
     for i, (onset, duration, description) in enumerate(zip(annotations[0], annotations[1], annotations[2])):
-        print(f"onset: {onset}, duration: {duration}, description: {description}")
-        
         marker = int(description)
         condition = conditions.get(marker, None)
         print(f"Annotation {i}: onset={onset}, duration={duration}, description={description} ({condition})")
