@@ -32,6 +32,7 @@ class LSTM_Classifier(nn.Module):
         
         x = x.permute(0,2,1)
         outputs, _ = self.lstm_layer(x)
+
         outputs = outputs[:, -1, :]
 
         outputs = self.linear_layer(outputs)

@@ -47,22 +47,11 @@ def train_model():
 
             pred = model(batchX)
 
-            print('dsadsa')
-
             loss = loss_fn(pred, batchY)
-            loss = torch.unsqueeze(loss, 0)
-
-            print(loss.shape)
-            print(loss)
 
             optimizer.zero_grad()
-            try:
-                loss.backward()
-            except Exception as e:
-                print("errrrr")
-                print(e)
+            loss.backward()
             optimizer.step()
-            print("dasdas")
 
             batch_losses.append(loss.detach().numpy())
 
@@ -79,10 +68,10 @@ def evaluate_model(model, test=True):
 
     if test is True:
         log_file = 'test_log.txt'
-        dataset = EEGDataset(test=True)
+        dataset = EEGDatasetV1()
     else:
         log_file = 'val_log.txt'
-        dataset = EEGDataset(val=True)
+        dataset = EEGDatasetV1()
     dataloader = utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
