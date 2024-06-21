@@ -34,17 +34,21 @@ class ResBlock(nn.Module):
             nn.BatchNorm1d(num_features=output_size)
         )
 
+        self.relu = nn.ReLU(inplace=True)
+
 
     def forward(self, x):
         
+        x = x.permute(0, 2, 1)
+
         output = self.conv_layer_1(x)
-        output = nn.ReLU(output, inplace=True)
+        output = self.relu(output)
         output = self.conv_layer_2(output)
 
         identity = self.downsample(x)
         output += identity
 
-        output = nn.ReLU(output, inplace=True)
+        output = self.relu(output)
 
         return output
 
@@ -96,9 +100,14 @@ class Model(nn.Module):
 
         output = self.residual_blocks(x)
 
+        print(output.shape)
         output = self.lstm_classifier(output)
 
-        outputs = nn.functional.softmax(outputs, dim=1)
+        print(output.shape)
+
+        output = nn.functional.softmax(output, dim=1)
+
+        print(output.shape)
 
         return output
     

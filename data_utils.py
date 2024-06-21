@@ -5,19 +5,17 @@ import pandas as pd
 
 import os, json
 
-
-
-label_path = 'formatted_data/label.csv'
-eeg_path = 'formatted_data/eeg'
+label_path = 'formatted_v1/label.csv'
+eeg_path = 'formatted_v1/eeg'
 
 class_to_idx = {
     "boredom": 0,
-    "engaged": 1
+    "interest": 1
 }
 
 idx_to_class = {
     0: "boredom",
-    1: "engaged"
+    1: "interest"
 }
 
 def fft_eeg(raw_eeg):
@@ -47,6 +45,40 @@ def preproc_eeg(raw_eeg):
     return processed_eeg
 
 
+class EEGDatasetV1(utils.data.Dataset):
+    
+    def __init__(self):
+
+        self.label_path = label_path
+        self.eeg_path = eeg_path
+
+        self.num_classes = 2
+
+        eegs, labels = [], []
+
+        label_df = pd.read_csv(self.label_path)
+
+        for eeg_idx in range(len(os.listdir(self.eeg_path))):
+            eeg = np.load(os.path.join(self.eeg_path, str(eeg_idx) + '.npy'))
+            eegs.append(eeg)
+            label = class_to_idx[label_df.iloc[eeg_idx - 1, 1]]
+            labels.append(label)
+
+        self.X = torch.tensor(np.array(eegs))
+        self.Y = torch.eye(self.num_classes)[labels]
+
+    
+    def __len__(self):
+        return len(self.X)
+    
+    def __getitem__(self, index):
+        X = self.X[index].type(torch.float32)
+        Y = self.Y[index].type(torch.float32)
+        return X, Y
+
+                
+        
+
 class EEGDataset(utils.data.Dataset):
     def __init__(self, test=False, val=False):
 
@@ -55,7 +87,7 @@ class EEGDataset(utils.data.Dataset):
 
         self.num_classes = 2
 
-        
+ 
         with open('dataset_split.json', 'r') as split_file:
             split = json.load(split_file)
             if test is True:
@@ -64,6 +96,7 @@ class EEGDataset(utils.data.Dataset):
                 self.indices = split['val']
             else:
                 self.indices = split['train']
+        
 
 
         eegs, labels = [], []

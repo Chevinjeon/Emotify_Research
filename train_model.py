@@ -7,8 +7,9 @@ from tqdm import tqdm
 
 from absl import flags
 
-from data_utils import EEGDataset, idx_to_class
+from data_utils import EEGDataset, EEGDatasetV1, idx_to_class
 from architecture import Model
+from architecture_v1 import ModelV1
 
 
 FLAGS = flags.FLAGS
@@ -17,17 +18,18 @@ flags.DEFINE_integer('batch_size', 8, '')
 flags.DEFINE_integer('train_epochs', 100, '')
 flags.DEFINE_float('learning_rate', 1e-3, '')
 flags.DEFINE_bool('evaluate', False, '')
-flags.DEFINE_bool('model_path', 'classifier.pt', '')
+flags.DEFINE_string('model_path', 'classifier.pt', '')
 
 def train_model():
 
-    train_dataset = EEGDataset()
-    train_dataloader = utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size, shuffle=False)
+    train_dataset = EEGDatasetV1()
+
+    train_dataloader = utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size, shuffle=True)
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model = Model().to(device)
+    model = ModelV1().to(device)
     optimizer = optim.Adam(model.parameters(), lr=FLAGS.learning_rate)
-    loss_fn = nn.BCELoss()
+    loss_fn = nn.CrossEntropyLoss()
 
     best_epoch_loss = float('inf')
     best_epoch_acc = float('-inf')
@@ -38,18 +40,32 @@ def train_model():
 
         model.train()
         for batch_idx, (batchX, batchY) in tqdm(enumerate(train_dataloader)):
+
             batchX, batchY = batchX.to(device), batchY.to(device)
 
             # batchX: [batch size, seq, num channels]
 
             pred = model(batchX)
+
+            print('dsadsa')
+
             loss = loss_fn(pred, batchY)
+            loss = torch.unsqueeze(loss, 0)
+
+            print(loss.shape)
+            print(loss)
 
             optimizer.zero_grad()
-            loss.backward()
+            try:
+                loss.backward()
+            except Exception as e:
+                print("errrrr")
+                print(e)
             optimizer.step()
+            print("dasdas")
 
             batch_losses.append(loss.detach().numpy())
+
 
         epoch_loss = np.mean(batch_losses)
         epoch_acc = evaluate_model(model, test=False)
