@@ -10,7 +10,7 @@ class LSTM_Classifier(nn.Module):
 
         self.lstm_input_dim = input_size
         self.lstm_hidden_dim = input_size
-        self.num_lstm_layers = 1
+        self.num_lstm_layers = 3
         self.bidir_lstm = True
 
         self.lstm_layer = nn.LSTM(
@@ -27,10 +27,11 @@ class LSTM_Classifier(nn.Module):
             in_features=self.lstm_output_dim,
             out_features=output_size
         )
+        
+        self.lstm_layer.flatten_parameters()
 
     def forward(self, x):
-        
-        x = x.permute(0,2,1)
+
         outputs, _ = self.lstm_layer(x)
 
         outputs = outputs[:, -1, :]
@@ -44,7 +45,7 @@ class ModelV1(nn.Module):
     def __init__(self, input_size=32, output_size=2):
         super(ModelV1, self).__init__()
 
-        self.lstm_classifier = LSTM_Classifier(input_size=256, output_size=output_size)
+        self.lstm_classifier = LSTM_Classifier(input_size=32, output_size=output_size)
 
     def forward(self, x):
 
