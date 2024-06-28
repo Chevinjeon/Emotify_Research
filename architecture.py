@@ -99,15 +99,12 @@ class Model(nn.Module):
     def forward(self, x):
 
         output = self.residual_blocks(x)
+        output = output.permute(0, 2, 1)
 
-        print(output.shape)
-        output = self.lstm_classifier(output)
-
-        print(output.shape)
+        output = self.lstm_classifier(output)    # expect [batch size, seq length, num channels]
 
         output = nn.functional.softmax(output, dim=1)
 
-        print(output.shape)
 
         return output
     

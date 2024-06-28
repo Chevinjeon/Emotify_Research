@@ -50,7 +50,7 @@ class ModelV1(nn.Module):
     def forward(self, x):
 
         output = self.lstm_classifier(x)
-
+        
         output = nn.functional.softmax(output, dim=1)
 
 
