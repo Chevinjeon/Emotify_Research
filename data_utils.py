@@ -60,7 +60,7 @@ class EEGDatasetV1(utils.data.Dataset):
 
         for eeg_idx in range(len(os.listdir(self.eeg_path))):
             eeg = np.load(os.path.join(self.eeg_path, str(eeg_idx) + '.npy'))
-            eegs.append(eeg[:1000,])
+            eegs.append(eeg[:20000,])
             label = class_to_idx[label_df.iloc[eeg_idx - 1, 1]]
             labels.append(label)
 

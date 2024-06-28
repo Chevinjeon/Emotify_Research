@@ -26,7 +26,8 @@ def train_model():
 
     train_dataloader = utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size, shuffle=True)
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cuda' # 'cuda' if torch.cuda.is_available() else 'cpu'
+
     model = ModelV1().to(device)
     optimizer = optim.Adam(model.parameters(), lr=FLAGS.learning_rate)
     loss_fn = nn.CrossEntropyLoss()
@@ -43,6 +44,7 @@ def train_model():
 
             batchX, batchY = batchX.to(device), batchY.to(device)
 
+
             # batchX: [batch size, seq, num channels]
 
             pred = model(batchX)
@@ -53,7 +55,7 @@ def train_model():
             loss.backward()
             optimizer.step()
 
-            batch_losses.append(loss.detach().numpy())
+            batch_losses.append(loss.detach().cpu().numpy())
 
 
         epoch_loss = np.mean(batch_losses)
