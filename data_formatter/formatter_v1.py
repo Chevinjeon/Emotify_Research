@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 data_file = 'output2.csv'
-formatted_folder = 'formatted_v1/'
+formatted_folder = '../formatted_v1/'
 label_file = os.path.join(formatted_folder, 'label.csv')
 
 sample_rate = 2048
@@ -27,6 +27,10 @@ def format_data(eeg, idx, label):
     
 
 def split_eeg():
+
+    with open(label_file, 'w') as f:
+        f.write('id,label')
+
     df = pd.read_csv(data_file)
     print(df.info)
     boredom_df = df.iloc[boredom_start : boredom_end, :32]      # to be replaced with useful columns
@@ -46,6 +50,7 @@ def split_eeg():
         current_idx += 1
 
     current_ts = 0
+
     while current_ts + sample_length <= interest_ts:
         eeg_chunk = interest_df.iloc[current_ts : current_ts + sample_length, :]
         format_data(eeg_chunk, current_idx, "interest")

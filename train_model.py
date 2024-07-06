@@ -18,17 +18,17 @@ flags.DEFINE_integer('batch_size', 8, '')
 flags.DEFINE_integer('train_epochs', 100, '')
 flags.DEFINE_float('learning_rate', 1e-3, '')
 flags.DEFINE_bool('evaluate', False, '')
-flags.DEFINE_string('model_path', 'classifier.pt', '')
+flags.DEFINE_string('model_path', 'classifier2.pt', '')
 
 def train_model():
 
-    train_dataset = EEGDatasetV1()
+    train_dataset = EEGDatasetV1(test=False)
 
     train_dataloader = utils.data.DataLoader(train_dataset, batch_size=FLAGS.batch_size, shuffle=True)
 
     device = 'cuda' # 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    model = ModelV1().to(device)
+    model = Model().to(device)
     optimizer = optim.Adam(model.parameters(), lr=FLAGS.learning_rate)
     loss_fn = nn.CrossEntropyLoss()
 
@@ -70,10 +70,10 @@ def evaluate_model(model, test=True):
 
     if test is True:
         log_file = 'test_log.txt'
-        dataset = EEGDatasetV1()
+        dataset = EEGDatasetV1(test=True)
     else:
         log_file = 'val_log.txt'
-        dataset = EEGDatasetV1()
+        dataset = EEGDatasetV1(test=True)
     dataloader = utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
