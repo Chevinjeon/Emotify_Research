@@ -1,7 +1,7 @@
 import mne
 
 # Load the raw EEG data from the .bdf file
-raw = mne.io.read_raw_bdf('444931.bdf', preload=True)
+raw = mne.io.read_raw_bdf('processed_data.bdf', preload=True)
 
 # Extract events (markers)
 events = mne.find_events(raw)
